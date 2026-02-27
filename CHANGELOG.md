@@ -4,6 +4,70 @@ Versioning: `x.y.z` — x = major feature change, y = minor feature change, z = 
 
 ---
 
+## [4.8.5] — 2026-02-27
+
+### Added
+- **`coordinator-migrate` command** — master can run `everyone migrate hub-url:<URL> pass:<password>`
+  to register all servers with a self-hosted Coordinator Hub (v5.0.0). Each server POSTs to
+  `/api/register`, writes the returned token to `coordinator.env`, sets
+  `COORDINATOR_PRIVATE_ENABLED=1`, and automatically upgrades to the Hub-capable v5.0.0 daemon
+  in a detached background process. Migration is atomic: registration + token + upgrade in one
+  Slack command. Servers that have already migrated skip gracefully.
+- **`COORDINATOR_PRIVATE_ENABLED` / `COORDINATOR_HUB_PRIMARY` / `COORDINATOR_HUB_TOKEN`** stubs
+  written to `coordinator.env` at install time (all blank/disabled; filled by `coordinator-migrate`).
+
+### Changed
+- `COORDINATOR_INSTALLER_URL` updated to the 4.8.5 URL; after migration, it is automatically
+  bumped to the Hub-server's v5.0.0 installer URL.
+- `COORDINATOR_VERSION` bumped to `4.8.5`.
+
+---
+
+## [4.8.2] — 2026-02-27
+
+### Added
+- **Auto API key provisioning** — if `CLAUDE_PRIMARY_API_KEY` is present in `coordinator-creds.cfg`
+  at install time, the key is injected automatically into `~/.claude.json` without requiring an
+  interactive auth step. Useful for fully automated deployments where the API key is pre-placed in
+  the config file.
+
+---
+
+## [4.8.0] — 2026-02-27
+
+### Added
+- **`run-claude` command type** — master can post `<hostname> run-claude: '<prompt>'` to execute
+  a raw `claude -p` call outside the coordinator context (no CLAUDE.md injection, no permission
+  wrapping). Useful for arbitrary one-off Claude prompts.
+- **Playwright / browser integration** — installer optionally runs `playwright install` and
+  `playwright install-deps` if the `playwright` Node package is detected after Claude Code
+  installation, enabling Claude Max browser-use tools.
+
+---
+
+## [4.7.0] — 2026-02-27
+
+### Added
+- **`&&`-chained commands** — master can chain sequential tasks in a single Slack message with
+  `&&`. Example: `everyone run: date && everyone run: uptime`. Each server executes the chain in
+  order; the next command is dispatched after the previous completes. Chains survive across upgrade
+  and migration events via a persistent `coordinator-pending-chain` file.
+- **`coordinator-health`** — compact one-line server health snapshot (CPU, RAM, disk, load,
+  service statuses including nginx, rabbitmq, opensips, freeswitch, elasticsearch, docker).
+  Installed to `/usr/local/bin/coordinator-health`.
+- **`coordinator-cert-check`** — SSL certificate expiry report across Let's Encrypt certbot-managed
+  and nginx vhost certs. Reports days remaining per certificate.
+- **`coordinator-docker-health`** — Docker container health summary; lists running, stopped, and
+  unhealthy containers.
+- **`coordinator-sip-health`** — OpenSIPS + FreeSWITCH health snapshot via `opensipsctl` and
+  `fs_cli`.
+- **`coordinator-amqp-status`** — RabbitMQ queue health via the management HTTP API; shows queue
+  depth and consumer count.
+- **`coordinator-security-check`** — quick security audit: SSH password auth, root login,
+  failed auth attempts (24h), UFW status, pending security updates, world-writable files in `/etc`.
+
+---
+
 ## [4.6.3] — 2026-02-26
 
 ### Fixed

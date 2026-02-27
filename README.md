@@ -1,6 +1,6 @@
 # Claude Coordinator Network
 
-A multi-server orchestration system for [Claude Code](https://claude.ai/code) CLI. Servers communicate via Slack, auto-elect leaders for multi-server tasks, and recover from auth failures — all without SSH.
+A multi-server orchestration system for [Claude Code](https://claude.ai/code) CLI. Servers communicate via Slack, auto-elect leaders for multi-server tasks, and recover from auth failures — all without SSH. **v4.8.5** is the final public Slack-only release; it adds `coordinator-migrate` for upgrading to a self-hosted Hub.
 
 ## What it does
 
@@ -15,6 +15,9 @@ A multi-server orchestration system for [Claude Code](https://claude.ai/code) CL
 - **Roll call** with version and IPs — post `roll call` to see all online servers, their version, role, status, public IP, private IP, and GCP zone
 - **Confirmation** — ambiguous messages (no server named) prompt for confirmation before acting
 - **Trust hierarchy** — MASTER (Slack UID) > LEADER (HMAC-signed) > BOT (verified peer) > UNVERIFIED
+- **`&&`-chained commands** — chain sequential tasks in one Slack message: `everyone run: date && everyone run: uptime`
+- **Health diagnostic scripts** — `coordinator-health`, `coordinator-cert-check`, `coordinator-docker-health`, `coordinator-sip-health`, `coordinator-amqp-status`, `coordinator-security-check` installed to `/usr/local/bin/`
+- **`coordinator-migrate`** — registers servers with a self-hosted Coordinator Hub in one Slack command; handles token write + daemon upgrade automatically
 
 ---
 
@@ -237,6 +240,11 @@ Both servers:
 | v4.5.0 | Peer sidebar threads (BOT-initiated), IP self-discovery, peer registry, `--sidebar`/`--thread` flags |
 | v4.5.1 | Remote upgrade via Slack (`everyone upgrade`), 10-min rollback watchdog, `coordinator-upgrade` script |
 | v4.6.0 | Roll call table (auto-aggregated, code-block), GCP project discovery, `coordinator-fetch --peers` |
+| v4.6.1–4.6.3 | Bug fixes: upgrade without systemd-run, roll call table polish, MASTER busy-lock override, stale lock cleanup, Slack mailto mangling fix |
+| v4.7.0 | `&&`-chained commands, health diagnostic scripts (`coordinator-health`, `coordinator-cert-check`, `coordinator-docker-health`, `coordinator-sip-health`, `coordinator-amqp-status`, `coordinator-security-check`) |
+| v4.8.0 | `run-claude` command type, Playwright browser integration |
+| v4.8.2 | Auto API key provisioning from `CLAUDE_PRIMARY_API_KEY` in creds config |
+| **v4.8.5** | **`coordinator-migrate` — Hub registration + automatic v5 upgrade in one command (final Slack-only release)** |
 
 ---
 
