@@ -1,0 +1,6 @@
+*.cfg
+*.env
+*.key
+*.secret
+coordinator-creds*
+cfg.cfg
